@@ -4,7 +4,8 @@ var logger          = require('morgan'),
     express         = require('express'),
     errorhandler    = require('errorhandler'),
     dotenv          = require('dotenv'),
-    bodyParser      = require('body-parser');
+    bodyParser      = require('body-parser'),
+	pg 				= require('pg');
 
 var app = express();
 
@@ -34,6 +35,18 @@ if (process.env.NODE_ENV === 'development') {
 app.use(require('./anonymous-routes'));
 app.use(require('./protected-routes'));
 app.use(require('./user-routes'));
+
+app.get('/db', function (request, response) {
+  pg.connect(process.env.DATABASE_URL, function(err, client, done) {
+    client.query('SELECT * FROM test_table', function(err, result) {
+      done();
+      if (err)
+       { console.error(err); response.send("Error " + err); }
+      else
+       { response.render('pages/db', {results: result.rows} ); }
+    });
+  });
+});
 
 var port = process.env.PORT || 3001;
 
