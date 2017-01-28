@@ -43,7 +43,7 @@ app.get('/db', function (request, response) {
       if (err)
        { console.error(err); response.send("Error " + err); }
       else
-       { response.render('pages/db', {results: result.rows} ); }
+       { response..send("Results " + result.rows} ); }
     });
   });
 });
@@ -53,4 +53,3 @@ var port = process.env.PORT || 3001;
 http.createServer(app).listen(port, function (err) {
   console.log('listening in http://localhost:' + port);
 });
-
