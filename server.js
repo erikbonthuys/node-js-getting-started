@@ -9,6 +9,8 @@ var logger          = require('morgan'),
 
 var app = express();
 
+var DB_URL_LOCAL = "postgres://erik:g00dl00king@localhost/test";
+
 dotenv.load();
 
 // Parsers
@@ -37,7 +39,7 @@ app.use(require('./protected-routes'));
 app.use(require('./user-routes'));
 
 app.get('/db', function (request, response) {
-  pg.connect(process.env.DATABASE_URL, function(err, client, done) {
+  pg.connect(process.env.DATABASE_URL || DB_URL_LOCAL, function(err, client, done) {
     client.query('SELECT * FROM test_table', function(err, result) {
       done();
       if (err)
