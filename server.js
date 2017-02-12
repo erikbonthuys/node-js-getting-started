@@ -1,15 +1,12 @@
-var logger          = require('morgan'),
-    cors            = require('cors'),
-    http            = require('http'),
-    express         = require('express'),
-    errorhandler    = require('errorhandler'),
-    dotenv          = require('dotenv'),
-    bodyParser      = require('body-parser'),
-	pg 				= require('pg');
+var logger = require('morgan'),
+    cors = require('cors'),
+    http = require('http'),
+    express = require('express'),
+    errorhandler = require('errorhandler'),
+    dotenv = require('dotenv'),
+    bodyParser = require('body-parser');
 
 var app = express();
-
-var DB_URL_LOCAL = "postgres://erik:g00dl00king@localhost/test";
 
 dotenv.load();
 
@@ -17,41 +14,31 @@ dotenv.load();
 // old version of line
 // app.use(bodyParser.urlencoded());
 // new version of line
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 app.use(bodyParser.json());
 app.use(cors());
 
 app.use(function(err, req, res, next) {
-  if (err.name === 'StatusError') {
-    res.send(err.status, err.message);
-  } else {
-    next(err);
-  }
+    if (err.name === 'StatusError') {
+        res.send(err.status, err.message);
+    } else {
+        next(err);
+    }
 });
 
 if (process.env.NODE_ENV === 'development') {
-  app.use(logger('dev'));
-  app.use(errorhandler())
+    app.use(logger('dev'));
+    app.use(errorhandler())
 }
 
-app.use(require('./anonymous-routes'));
-app.use(require('./protected-routes'));
-app.use(require('./user-routes'));
-
-app.get('/db', function (request, response) {
-  pg.connect(process.env.DATABASE_URL || DB_URL_LOCAL, function(err, client, done) {
-    client.query('SELECT * FROM test_table', function(err, result) {
-      done();
-      if (err)
-       { console.error(err); response.send("Error " + err); }
-      else
-       { response.send("Results " + result.rows[0].name); }
-    });
-  });
-});
+// app.use(require('./anonymous-routes'));
+app.use(require('./controllers/protected-routes'));
+app.use(require('./controllers/user-routes'));
 
 var port = process.env.PORT || 3001;
 
-http.createServer(app).listen(port, function (err) {
-  console.log('listening in http://localhost:' + port);
+http.createServer(app).listen(port, function(err) {
+    console.log('listening in http://localhost:' + port);
 });
